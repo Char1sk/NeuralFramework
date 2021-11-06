@@ -60,7 +60,30 @@ class Model():
     # 若参数给的是多次输出的列表(如trainOutputs, trainLabel)
     #       则返回准确率列表，即每次的准确率的列表
     def calculateAccuracy(self, output, label):
-        pass
+        if(type(output)!=list):#判断是否为多个的outputs或单个outputs
+        
+            ###构造混淆矩阵
+            x_i =output.shape[0]
+            y_i =output.shape[1]
+            mid = np.zeros((x_i,x_i))
+            idx_output = np.argmax(output, axis=0)
+            idx_label= np.argmax(label, axis=0)
+            for i in range(y_i):
+                mid[idx_output[i]][idx_label[i]]+=1
+        #####
+        ###求Accuracy
+            son = 0
+            for i in range(mid.shape[0]):
+                son +=mid[i][i]
+            acc = son/output.shape[1]       
+            return acc
+    
+        else:###列表情况下求Accuracy，并返回相应列表
+            accList = []
+            for i in range(len(output)):
+                accList.append(calculateAccuracy(output[i], label[i]))
+            return accList
+
 
     # TODO:
     # 用于计算给出预测结果和实际标签的准确率
@@ -72,7 +95,27 @@ class Model():
     # 若参数给的是多次输出的列表(如trainOutputs, trainLabel)
     #       则返回准确率列表，即每次的准确率的列表
     def calculateRecall(self, output, label):
-        pass
+        if(type(output)!=list):
+        
+       ###构造混淆矩阵  
+            x_i =output.shape[0]
+            y_i =output.shape[1]
+            mid = np.zeros((x_i,x_i))
+            idx_output = np.argmax(output, axis=0)
+            idx_label= np.argmax(label, axis=0)
+            for i in range(y_i):
+                mid[idx_output[i]][idx_label[i]]+=1
+            Recall = np.zeros(x_i)
+            for i in range(x_i):
+                Recall[i] = mid[i][i]/np.sum(mid,axis=1)[i]  
+            return Recall
+    
+    
+       else:#####列表情况下求Recall，并返回相应列表
+            RecallList = []
+            for i in range(len(output)):
+                RecallList.append(calculateRecall(output[i], label[i]))
+            return RecallList
 
     # TODO:
     # 用于计算给出预测结果和实际标签的准确率
@@ -84,7 +127,28 @@ class Model():
     # 若参数给的是多次输出的列表(如trainOutputs, trainLabel)
     #       则返回准确率列表，即每次的准确率的列表
     def calculatePrecision(self, output, label):
-        pass
+        if(type(output)!=list):##判断是否为多个的outputs或单个outputs
+            
+        ###构造混淆矩阵    
+            x_i =output.shape[0]
+            y_i =output.shape[1]
+            mid = np.zeros((x_i,x_i))
+            idx_output = np.argmax(output, axis=0)
+            idx_label= np.argmax(label, axis=0)
+            for i in range(y_i):
+                 mid[idx_output[i]][idx_label[i]]+=1
+        #####
+            Precision = np.zeros(x_i)
+            for i in range(x_i):
+                Precision[i] = mid[i][i]/np.sum(mid,axis=0)[i]  
+            return Precision
+    
+    
+        else:###列表情况下求 Precision，并返回相应列表
+            PrecisionList = []
+            for i in range(len(output)):
+                PrecisionList.append(calculatePrecision(output[i], label[i]))
+            return PrecisionList
 
     # TODO:
     # 用于计算给出预测结果和实际标签的准确率
@@ -96,7 +160,21 @@ class Model():
     # 若参数给的是多次输出的列表(如trainOutputs, trainLabel)
     #       则返回准确率列表，即每次的准确率的列表
     def calculateF1Score(self, output, label):
-        pass
+        if(type(output)!=list):
+    
+            x_i =output.shape[0]
+            Recall = calculateRecall(output, label)
+            Precision = calculatePrecision(output, label)
+            F1Score = np.zeros(x_i)
+            for i in range(x_i):
+                F1Score[i] = 2*Recall[i]*Precision[i]/(Recall[i]+Precision[i])
+            return  F1Score
+    
+        else: #####列表情况下求F1Score，并返回相应列表
+            F1ScoreList = []
+            for i in range(len(output)):
+                F1ScoreList.append(calculateF1Score(output[i], label[i]))
+            return F1ScoreList        
 
     # UPDATE: 针对给定的小集合，计算预测结果
     # 用于计算给定数据情况下，网络的预测输出
