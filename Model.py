@@ -137,7 +137,7 @@ class Model():
         else:###列表情况下求Accuracy，并返回相应列表
             accList = []
             for i in range(len(output)):
-                accList.append(calculateAccuracy(output[i], label[i]))
+                accList.append(calculateAccuracy(output[i], label))
             return accList
 
 
@@ -170,7 +170,7 @@ class Model():
         else:#####列表情况下求Recall，并返回相应列表
             RecallList = []
             for i in range(len(output)):
-                RecallList.append(calculateRecall(output[i], label[i]))
+                RecallList.append(calculateRecall(output[i], label))
             return RecallList
 
     # TODO:
@@ -203,7 +203,7 @@ class Model():
         else:###列表情况下求 Precision，并返回相应列表
             PrecisionList = []
             for i in range(len(output)):
-                PrecisionList.append(calculatePrecision(output[i], label[i]))
+                PrecisionList.append(calculatePrecision(output[i], label))
             return PrecisionList
 
     # TODO:
@@ -229,7 +229,7 @@ class Model():
         else: #####列表情况下求F1Score，并返回相应列表
             F1ScoreList = []
             for i in range(len(output)):
-                F1ScoreList.append(calculateF1Score(output[i], label[i]))
+                F1ScoreList.append(calculateF1Score(output[i], label))
             return F1ScoreList        
 
     # UPDATE: 针对给定的小集合，计算预测结果
