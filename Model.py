@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 class Model():
     # UPDATE: 有新的参数等直接新增即可
     # DISCUSS 是直接保存dataset/setting对象，还是拷贝其成员？
@@ -20,6 +23,9 @@ class Model():
         self.alpha = setting.alpha
         self.epoch = setting.epoch
         self.weight = setting.weight
+
+        self.bias = 0       # 暂用 #
+
         # 训练过程中，训练集和验证集的预测结果
         # 在训练时填充列表，记录每一次的结果
         # 在需要获取过程中指标时，再利用这些计算
@@ -42,6 +48,56 @@ class Model():
             self.trainOutputs.append(self.getOutput(self.trainData, self.trainLabel))
             self.validateOutputs.append(self.getOutput(self.validateData, self.validateLabel))
             # UPDATE: 更新权值
+
+
+    ##################
+    ##################
+    #### 展示使用 #####
+    # 二分类感知机
+    # 更新weight,bias
+    # 每一次的pred填入trainOutputs
+    # 更新完成后再算一次pred填入trainResult
+    def PerceptronTrain(self):
+        print("#### PerceptronTrain Begin ####\n")
+        for epoch in range(self.epoch):     # 
+            print("epoch{:<3d}: w = {}, b = {}".format(epoch,self.weight[1],self.bias))
+            error=np.zeros((1,self.trainData.shape[1]))
+            for i in range(self.trainData.shape[1]):
+                pred = self.hardlim(np.dot(self.weight[1],self.trainData[:,i:i+1])+self.bias)
+                error[:,i] = self.trainLabel[:,i:i+1] - pred
+
+                self.weight[1] += np.dot(error[:,i:i+1],self.trainData[:,i:i+1].T)
+                self.bias += error[:,i:i+1]
+                self.trainOutputs.append(pred)
+                print(pred,"<->",self.trainLabel[:,i:i+1])
+
+            if error.max()==0 and error.min()==0:   # 分类完全正确
+                break
+        print("\n#### PerceptronTrain End ####")
+        pred=np.zeros((self.trainLabel.shape))        
+        for i in range(self.trainData.shape[1]):
+            pred[:,i] = self.hardlim(np.dot(self.weight[1],self.trainData[:,i:i+1])+self.bias)
+        self.trainResult=pred
+        
+    # 非线性激活函数
+    def hardlim(self,x):
+        x=np.where(x>0,1,0)
+        return x
+    
+    # 分类面展示
+    def draw(self,data,label):
+        plt.xlim(-2,2)
+        plt.ylim(-2,2)
+        plt.scatter(data[0,:],data[1,:],c=label[0,:])
+        x=np.array([-2,2])
+        y=-(self.weight[1][:,0]*x+self.bias)/self.weight[1][:,1]
+        plt.plot(x,y.reshape(2,),c='r')
+        plt.show()
+    #### 展示使用 #####
+    ##################
+    ##################
+    
+
 
     # 进行训练完成后的测试，保存测试结果
     def test(self):
@@ -96,8 +152,8 @@ class Model():
     #       则返回准确率列表，即每次的准确率的列表
     def calculateRecall(self, output, label):
         if(type(output)!=list):
-        
-       ###构造混淆矩阵  
+            
+            ###构造混淆矩阵  
             x_i =output.shape[0]
             y_i =output.shape[1]
             mid = np.zeros((x_i,x_i))
@@ -110,8 +166,8 @@ class Model():
                 Recall[i] = mid[i][i]/np.sum(mid,axis=1)[i]  
             return Recall
     
-    
-       else:#####列表情况下求Recall，并返回相应列表
+         
+        else:#####列表情况下求Recall，并返回相应列表
             RecallList = []
             for i in range(len(output)):
                 RecallList.append(calculateRecall(output[i], label[i]))
@@ -185,3 +241,6 @@ class Model():
     # @return output: 预测的结果(网络输出)
     def getOutput(self, data, label):
         pass
+
+#if __name__ == '__main__':
+    

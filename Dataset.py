@@ -20,6 +20,13 @@ class Dataset():
     # 该dataset类的数据（无论标签还是数据本身）只能接收二维numpy数组（即使是一维也要写成2d array形式）
     def __init__(self, allSet=[None, None], trainSet=[None, None],
                  validateSet=[None, None], testSet=[None, None]):
+        #
+        try:
+            if allSet[0].shape[1]!=allSet[1].shape[1]:
+                raise ValueError("数据与标签不匹配！")
+        except ValueError as e:
+            print("引发异常：",repr(e))
+            raise
         (self.allData, self.allLabel) = allSet
         (self.trainData, self.trainLabel) = trainSet
         (self.validateData, self.validateLabel) = validateSet
@@ -37,7 +44,7 @@ class Dataset():
         # Error Check
         try:
             testRatio = 1-trainRatio-validateRatio
-            if testRatio<=0:
+            if testRatio<0:
                 raise ValueError("错误的划分比例！")
         except ValueError as e:
             print("引发异常：",repr(e))
@@ -50,6 +57,7 @@ class Dataset():
         train_idx = idxs[:train_size]
         val_idx = idxs[train_size:train_size+val_size]
         test_idx = idxs[train_size+val_size:]
+
         # split the allset(both data and label)
         self.trainData = self.allData[:,train_idx]
         self.trainLabel = self.allLabel[:,train_idx]
@@ -58,13 +66,17 @@ class Dataset():
         self.testData = self.allData[:,test_idx]
         self.testLabel = self.allLabel[:,test_idx]
 
+
     # TODO: (包含 all train validate test 的 getter)
     # 把数据集的输入和标签放在列表输出
     # @return allSet: 下标0为输入，下标1为标签
     def getAllSet(self):
         # use 2d list to return the dataset in class Dataset
-        return [[self.allData, self.allLabel], [self.trainData, self.trainLabel],
-                [self.validateData, self.validateLabel], [self.testData, self.testLabel]]
+        return [[self.allData, self.allLabel], 
+                [self.trainData, self.trainLabel],
+                [self.validateData, self.validateLabel], 
+                [self.testData, self.testLabel]]
+
 
     # TODO: (包含 all train validate test 的 setter)
     # 把数据集的输入和标签放在列表进行赋值
@@ -77,6 +89,7 @@ class Dataset():
         self.trainData, self.trainLabel = allSet[1]
         self.validateData, self.validateLabel = allSet[2]
         self.testData, self.testLabel = allSet[3]
+
 
     # TODO:
     # 把自身数据集保存到文件(文件结构方便读取和保存就行)

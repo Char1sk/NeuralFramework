@@ -41,7 +41,6 @@ class Setting():
                 self.weight[l] = np.random.uniform(-bound,bound, (layers[l],layers[l-1]))
         else: #输入错误
             pass
-
         
 
     # TODO:
@@ -49,6 +48,7 @@ class Setting():
     # @param path: 保存文件的路径名
     def saveSetting(self, path):
         np.savez(path,layers=self.layers, batch=self.batch, alpha=self.alpha, epoch=self.epoch, initialize=self.initialize)
+        print("param saved to {}.npz".format(path))
 
     # TODO:
     # 先清空原设置，再从已有文件读取设置，直接更改自身成员
@@ -74,4 +74,26 @@ class Setting():
                 self.weight[l] = np.random.uniform(-bound,bound, (self.layers[l],self.layers[l-1]))
         else: #输入错误
             pass
+    
 
+    # DEBUG:
+    # 输出所有成员
+    def ParamShow(self):        
+        print('layers =',self.layers)
+        print('depth =',self.depth)
+        print('batch =',self.batch)
+        print('alpha =',self.alpha)
+        print('epoch =',self.epoch)
+        print('initialize =',self.initialize)
+
+if __name__ == '__main__':
+    #给定初始化参数
+    layers = [100,100,10]
+    s1 = Setting(layers,50,0.1,200,'uniform')
+    s1.ParamShow()
+    print("-"*30)
+    #默认参数    
+    s2 = Setting()
+    s2.ParamShow()
+    s2.saveSetting('parmlist')
+    print("-"*30)
