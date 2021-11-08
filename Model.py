@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from Dataset import Dataset
+from Setting import Setting
 
 class Model():
     # UPDATE: 有新的参数等直接新增即可
@@ -100,7 +102,7 @@ class Model():
 
 
     # 进行训练完成后的测试，保存测试结果
-    def test(self):
+    def model(self):
         # 记录训练集、验证集、测试集的预测结果
         self.trainResult = self.getOutput(self.trainData, self.trainLabel)
         self.validateResult = self.getOutput(self.validateData, self.validateLabel)
@@ -137,7 +139,7 @@ class Model():
         else:###列表情况下求Accuracy，并返回相应列表
             accList = []
             for i in range(len(output)):
-                accList.append(calculateAccuracy(output[i], label))
+                accList.append(self.calculateAccuracy(output[i], label))
             return accList
 
 
@@ -170,7 +172,7 @@ class Model():
         else:#####列表情况下求Recall，并返回相应列表
             RecallList = []
             for i in range(len(output)):
-                RecallList.append(calculateRecall(output[i], label))
+                RecallList.append(self.calculateRecall(output[i], label))
             return RecallList
 
     # TODO:
@@ -202,8 +204,9 @@ class Model():
     
         else:###列表情况下求 Precision，并返回相应列表
             PrecisionList = []
+
             for i in range(len(output)):
-                PrecisionList.append(calculatePrecision(output[i], label))
+                PrecisionList.append(self.calculatePrecision(output[i], label))
             return PrecisionList
 
     # TODO:
@@ -219,8 +222,8 @@ class Model():
         if(type(output)!=list):
     
             x_i =output.shape[0]
-            Recall = calculateRecall(output, label)
-            Precision = calculatePrecision(output, label)
+            Recall = self.calculateRecall(output, label)
+            Precision =self.calculatePrecision(output, label)
             F1Score = np.zeros(x_i)
             for i in range(x_i):
                 F1Score[i] = 2*Recall[i]*Precision[i]/(Recall[i]+Precision[i])
@@ -229,7 +232,7 @@ class Model():
         else: #####列表情况下求F1Score，并返回相应列表
             F1ScoreList = []
             for i in range(len(output)):
-                F1ScoreList.append(calculateF1Score(output[i], label))
+                F1ScoreList.append(self.calculateF1Score(output[i], label))
             return F1ScoreList        
 
     # UPDATE: 针对给定的小集合，计算预测结果
@@ -242,5 +245,43 @@ class Model():
     def getOutput(self, data, label):
         pass
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
     
+    data = np.array([[0,0],
+                        [1,0],
+                        [0,1],
+                        [1,1]])
+    label = np.array([[1, 1, 1, 0]])
+    
+    # 数据过少不进行分划
+    data = Dataset(allSet=[data.T, label])
+    #data.divideData(1,0)
+    #data.showall()
+
+    # 只需额外定义layers
+    s = Setting([2,1])
+    #s.ParamShow()
+
+    model = Model(data, s)
+    output = np.ones((6,10))
+    label = np.zeros((6,10))
+    outputs =[]
+    outputs.append(output)
+    outputs.append(output)
+    print("Accuracy:")
+    print(model.calculateAccuracy(output,label))    
+    print("Precision:")
+    print(model.calculatePrecision(output,label))
+    print("Recall:")
+    print(model.calculateRecall(output,label))
+    print("F1Score:")
+    print(model.calculateF1Score(output,label))
+    print("-"*20)
+    print("Accuracy:")
+    print(model.calculateAccuracy(outputs,label))
+    print("Precision:")
+    print(model.calculatePrecision(outputs,label))
+    print("Recall:")
+    print(model.calculateRecall(outputs,label))
+    print("F1Score:")
+    print(model.calculateF1Score(outputs,label))
