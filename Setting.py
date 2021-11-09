@@ -60,6 +60,7 @@ class Setting():
         self.batch =t['batch']
         self.alpha =t['alpha']
         self.epoch =t['epoch']
+        self.initialize=t['initialize']
         initialize=t['initialize']
 
         if initialize == 'normal':
@@ -74,6 +75,8 @@ class Setting():
                 self.weight[l] = np.random.uniform(-bound,bound, (self.layers[l],self.layers[l-1]))
         else: #输入错误
             pass
+
+
     
 
     # DEBUG:
@@ -91,9 +94,13 @@ if __name__ == '__main__':
     layers = [100,100,10]
     s1 = Setting(layers,50,0.1,200,'uniform')
     s1.ParamShow()
+    s1.saveSetting('parmlist')
     print("-"*30)
     #默认参数    
     s2 = Setting()
     s2.ParamShow()
-    s2.saveSetting('parmlist')
     print("-"*30)
+    #读取文件
+    s3 = Setting()
+    s3.loadSetting('parmlist.npz')
+    s3.ParamShow()
