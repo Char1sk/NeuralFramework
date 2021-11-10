@@ -20,13 +20,14 @@ class Dataset():
     # 该dataset类的数据（无论标签还是数据本身）只能接收二维numpy数组（即使是一维也要写成2d array形式）
     def __init__(self, allSet=[None, None], trainSet=[None, None],
                  validateSet=[None, None], testSet=[None, None]):
-        #
-        try:
-            if allSet[0].shape[1]!=allSet[1].shape[1]:
-                raise ValueError("数据与标签不匹配！")
-        except ValueError as e:
-            print("引发异常：",repr(e))
-            raise
+        # 异常检测
+        if allSet[0] is not None and allSet[1] is not None:
+            try:
+                if allSet[0].shape[1] != allSet[1].shape[1]:
+                    raise ValueError("数据与标签不匹配！")
+            except ValueError as e:
+                print("引发异常：", repr(e))
+                raise
         (self.allData, self.allLabel) = allSet
         (self.trainData, self.trainLabel) = trainSet
         (self.validateData, self.validateLabel) = validateSet
@@ -44,10 +45,10 @@ class Dataset():
         # Error Check
         try:
             testRatio = 1-trainRatio-validateRatio
-            if testRatio<0:
+            if testRatio < 0:
                 raise ValueError("错误的划分比例！")
         except ValueError as e:
-            print("引发异常：",repr(e))
+            print("引发异常：", repr(e))
             raise
         # determine the set's size
         data_size = self.allLabel.shape[1]
@@ -59,24 +60,22 @@ class Dataset():
         test_idx = idxs[train_size+val_size:]
 
         # split the allset(both data and label)
-        self.trainData = self.allData[:,train_idx]
-        self.trainLabel = self.allLabel[:,train_idx]
-        self.validateData = self.allData[:,val_idx]
-        self.validateLabel = self.allLabel[:,val_idx]
-        self.testData = self.allData[:,test_idx]
-        self.testLabel = self.allLabel[:,test_idx]
-
+        self.trainData = self.allData[:, train_idx]
+        self.trainLabel = self.allLabel[:, train_idx]
+        self.validateData = self.allData[:, val_idx]
+        self.validateLabel = self.allLabel[:, val_idx]
+        self.testData = self.allData[:, test_idx]
+        self.testLabel = self.allLabel[:, test_idx]
 
     # TODO: (包含 all train validate test 的 getter)
     # 把数据集的输入和标签放在列表输出
     # @return allSet: 下标0为输入，下标1为标签
     def getAllSet(self):
         # use 2d list to return the dataset in class Dataset
-        return [[self.allData, self.allLabel], 
+        return [[self.allData, self.allLabel],
                 [self.trainData, self.trainLabel],
-                [self.validateData, self.validateLabel], 
+                [self.validateData, self.validateLabel],
                 [self.testData, self.testLabel]]
-
 
     # TODO: (包含 all train validate test 的 setter)
     # 把数据集的输入和标签放在列表进行赋值
@@ -89,7 +88,6 @@ class Dataset():
         self.trainData, self.trainLabel = allSet[1]
         self.validateData, self.validateLabel = allSet[2]
         self.testData, self.testLabel = allSet[3]
-
 
     # TODO:
     # 把自身数据集保存到文件(文件结构方便读取和保存就行)
@@ -140,22 +138,22 @@ if __name__ == '__main__':
     data_process.divideData()
     data_process.showall()
     print("------- data get check -------")
-    [[all_d, all_l],[train_d, train_l],[val_d,val_l],[test_d,test_l]] = data_process.getAllSet()
+    [[all_d, all_l], [train_d, train_l], [val_d, val_l], [test_d, test_l]] = data_process.getAllSet()
     print("all set data & label")
     print(all_d, all_l)
     print("train set data & label")
     print(train_d, train_l)
     print("val set data & label")
-    print(val_d,val_l)
+    print(val_d, val_l)
     print("test set data & label")
-    print(test_d,test_l)
+    print(test_d, test_l)
     print("------ data save check -------")
     data_process.saveDataset('data.pkl')
-    data_process2 = Dataset()
     print("------ data load check -------")
-    data_process2.loadDataset('data')
+    data_process2 = Dataset()
+    data_process2.loadDataset('data.pkl')
     data_process2.showall()
     print("------- data set check -------")
     data_process3 = Dataset()
-    data_process3.setAllSet([[alldata, alllabel],[None, None],[None,None],[None, None]])
+    data_process3.setAllSet([[alldata, alllabel], [None, None], [None, None], [None, None]])
     data_process3.showall()
