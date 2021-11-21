@@ -43,14 +43,12 @@ class Setting():
         else:  # 输入错误
             pass
 
-    # TODO:
     # 把自身设置保存到文件(文件结构方便读取和保存就行)
     # @param path: 保存文件的路径名
     def saveSetting(self, path):
         np.savez(path, layers=self.layers, batch=self.batch, alpha=self.alpha, epoch=self.epoch, initialize=self.initialize)
         print("param saved to {}.npz".format(path))
 
-    # TODO:
     # 先清空原设置，再从已有文件读取设置，直接更改自身成员
     # @param path: 读取文件的路径名
     def loadSetting(self, path):

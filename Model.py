@@ -114,7 +114,6 @@ class Model():
         self.validateResult = self.getOutput(self.validateData, self.validateLabel)
         self.testResult = self.getOutput(self.testData, self.testLabel)
 
-    # TODO:
     # 用于计算给出预测结果和实际标签的准确率
     # @param output: 预测输出
     # @param label: 实际标签
@@ -146,7 +145,6 @@ class Model():
                 accList.append(self.calculateAccuracy(output[i], label))
             return accList
 
-    # TODO:
     # 用于计算给出预测结果和实际标签的准确率
     # @param output: 预测输出
     # @param label: 实际标签
@@ -177,7 +175,6 @@ class Model():
                 RecallList.append(self.calculateRecall(output[i], label))
             return RecallList
 
-    # TODO:
     # 用于计算给出预测结果和实际标签的准确率
     # @param output: 预测输出
     # @param label: 实际标签
@@ -208,7 +205,6 @@ class Model():
                 PrecisionList.append(self.calculatePrecision(output[i], label))
             return PrecisionList
 
-    # TODO:
     # 用于计算给出预测结果和实际标签的准确率
     # @param output: 预测输出
     # @param label: 实际标签

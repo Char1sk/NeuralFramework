@@ -33,7 +33,6 @@ class Dataset():
         (self.validateData, self.validateLabel) = validateSet
         (self.testData, self.testLabel) = testSet
 
-    # TODO:
     # 用户自己调用，把完整数据集随机分为训练集和测试集
     # trainRatio 给训练集
     # validateRatio 给验证集
@@ -67,7 +66,6 @@ class Dataset():
         self.testData = self.allData[:, test_idx]
         self.testLabel = self.allLabel[:, test_idx]
 
-    # TODO: (包含 all train validate test 的 getter)
     # 把数据集的输入和标签放在列表输出
     # @return allSet: 下标0为输入，下标1为标签
     def getAllSet(self):
@@ -77,7 +75,6 @@ class Dataset():
                 [self.validateData, self.validateLabel],
                 [self.testData, self.testLabel]]
 
-    # TODO: (包含 all train validate test 的 setter)
     # 把数据集的输入和标签放在列表进行赋值
     # @param allSet: 下标0为输入，下标1为标签
     def setAllSet(self, allSet):
@@ -89,7 +86,6 @@ class Dataset():
         self.validateData, self.validateLabel = allSet[2]
         self.testData, self.testLabel = allSet[3]
 
-    # TODO:
     # 把自身数据集保存到文件(文件结构方便读取和保存就行)
     # @param path: 保存文件的路径名
     def saveDataset(self, path):
@@ -99,7 +95,6 @@ class Dataset():
                          self.validateLabel, self.testData, self.testLabel], f)
         print("test data saved to {}".format(path))
 
-    # TODO:
     # 从已有文件读取数据，直接更改自身成员
     # @param path: 读取文件的路径名
     def loadDataset(self, path):
