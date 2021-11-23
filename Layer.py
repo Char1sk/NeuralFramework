@@ -12,10 +12,9 @@ class Layer():
     # a z delta 等稍后计算获得
     # @param count: 一层神经元的个数
     # @param activation: 该层神经元的激活函数
-    def __init__(self, count, activation, activation_prop):
+    def __init__(self, count, activation):
         self.count = count
         self.activation = activation
-        self.activation_prop = activation_prop
         self.z = None
         self.a = None
         self.delta = None
