@@ -40,6 +40,9 @@ class Setting():
             for l in range(1, self.depth):
                 bound = np.sqrt(6./(layers[l] + layers[l-1]))
                 self.weight[l] = np.random.uniform(-bound, bound, (layers[l], layers[l-1]))
+        elif initialize == 'zero':
+            for l in range(1, self.depth):
+                self.weight[l] = 0.1 * np.zeros((layers[l], layers[l-1]))
         else:  # 输入错误
             pass
 
