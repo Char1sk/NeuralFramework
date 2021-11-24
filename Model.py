@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from Dataset import Dataset
 from Setting import Setting
+import Utility as ut
 
 
 class Model():
@@ -26,9 +27,8 @@ class Model():
         self.alpha = setting.alpha
         self.epoch = setting.epoch
         self.weight = setting.weight
-
         self.bias = 0  # 暂用!!!!!!!!!!
-
+        (self.costFunction, self.dCostFunction) = self.func_prop(setting.costFunction)
         # 混淆矩阵，计算指标时的中间结果
         self.confusionMatrix = None
         # 训练过程中，训练集和验证集的预测结果
@@ -42,6 +42,12 @@ class Model():
         self.trainResult = None
         self.validateResult = None
         self.testResult = None
+
+    def func_prop(self, fname):
+        if fname == 'meanSquareError':
+            return (ut.meanSquareError, ut.meanSqrop)
+        if fname == 'crossEntrophy':
+            return (ut.crossEntropy, ut.crossEntropySoftmax)
 
     # UPDATE: 以后写训练的时候再来改，函数只是表明有这个步骤
     # 进行迭代训练过程，更新权重，记录中间结果

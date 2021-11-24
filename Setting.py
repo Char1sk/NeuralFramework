@@ -19,30 +19,31 @@ class Setting():
     # @param alpha: 学习率
     # @param epoch: 总训练周期数
     # @param initialize: w的初始化方法，为字符串
-    def __init__(self, layers=[], batch=100, alpha=0.1, epoch=100, initialize='normal'):
+    def __init__(self, layers=[], batch=100, alpha=0.1, epoch=100, initialize='normal', costFunction='meanSquareError'):
         self.depth = len(layers)
         self.layers = layers
         self.batch = batch
         self.alpha = alpha
         self.epoch = epoch
         self.initialize = initialize
+        self.costFunction = costFunction
         # TODO:
         # 此处依据初始化方式进行初始化
         # 目前有 normal uniform xavier
         self.weight = {}
         if initialize == 'normal':
             for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.randn(layers[l], layers[l-1])
+                self.weight[l] = 0.1 * np.random.randn(layers[l].count, layers[l-1].count)
         elif initialize == 'uniform':
             for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.uniform(0, 1, (layers[l], layers[l-1]))
+                self.weight[l] = 0.1 * np.random.uniform(0, 1, (layers[l].count, layers[l-1].count))
         elif initialize == 'xavier':
             for l in range(1, self.depth):
                 bound = np.sqrt(6./(layers[l] + layers[l-1]))
-                self.weight[l] = np.random.uniform(-bound, bound, (layers[l], layers[l-1]))
+                self.weight[l] = np.random.uniform(-bound, bound, (layers[l].count, layers[l-1].count))
         elif initialize == 'zero':
             for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.zeros((layers[l], layers[l-1]))
+                self.weight[l] = 0.1 * np.zeros((layers[l].count, layers[l-1].count))
         else:  # 输入错误
             pass
 
@@ -86,20 +87,3 @@ class Setting():
         print('alpha =', self.alpha)
         print('epoch =', self.epoch)
         print('initialize =', self.initialize)
-
-
-if __name__ == '__main__':
-    # 给定初始化参数
-    layers = [100, 100, 10]
-    s1 = Setting(layers, 50, 0.1, 200, 'uniform')
-    s1.ParamShow()
-    s1.saveSetting('parmlist')
-    print("-"*30)
-    # 默认参数
-    s2 = Setting()
-    s2.ParamShow()
-    print("-"*30)
-    # 读取文件
-    s3 = Setting()
-    s3.loadSetting('parmlist.npz')
-    s3.ParamShow()
