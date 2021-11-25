@@ -1,5 +1,6 @@
 .git
 .vscode
+*.mat
 *.pkl
 *.npz
 __pycache__

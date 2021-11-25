@@ -3,7 +3,7 @@ from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
 from Model import Model
-from Utility import sigmoid, sigmoidProp, hardlim
+from Utility import sigmoid, dSigmoid, hardlim
 from scipy.io import loadmat
 
 
@@ -26,8 +26,8 @@ class SGD(Model):
         for epoch_num in range(self.epoch):
             idxs = np.random.permutation(train_size)
             for k in idxs:       # SGD形式，每次只选择一个样本求更新结果
-                self.layers[0].a = self.trainData[:, k].reshape(-1,1)
-                y = self.trainLabel[:, k].reshape(-1,1)
+                self.layers[0].a = self.trainData[:, k].reshape(-1, 1)
+                y = self.trainLabel[:, k].reshape(-1, 1)
                 # forward computation
                 for l in range(0, L-1):
                     self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)
@@ -35,11 +35,11 @@ class SGD(Model):
                     # print(l, self.layers[l+1].a.shape)
                 # backward computation
                 self.layers[L-1].delta = self.dCostFunction(self.layers[L-1].a, y) * \
-                                         eval(self.layers[L-1].activation_prop)(self.layers[L-1].z)
+                    eval(self.layers[L-1].dactivation)(self.layers[L-1].z)
                 # print(self.layers[L-1].delta.shape)
                 for l in range(L - 2, 0, -1):
                     self.layers[l].delta = np.dot(self.weight[l+1].T, self.layers[l+1].delta) \
-                                           * eval(self.layers[l].activation_prop)(self.layers[l].z)
+                                           * eval(self.layers[l].dactivation)(self.layers[l].z)
                 # weights update
                 for l in range(0, L-1):
                     # print(self.layers[l + 1].delta.shape)
@@ -81,22 +81,22 @@ if __name__ == '__main__':
     testData, testLabels = m['testData'], m['testLabels']
     train_size = 10000
     X_all = trainData.reshape(-1, train_size)
-    X_train = X_all[:,:8000]
-    Y_train = trainLabels[:,:8000]
+    X_train = X_all[:, :8000]
+    Y_train = trainLabels[:, :8000]
     val_size = 2000
-    X_validate = X_all[:,8000:]
+    X_validate = X_all[:, 8000:]
     Y_validate = trainLabels[:, 8000:]
     test_size = 2000
     X_test = testData.reshape(-1, test_size)
     Y_test = testLabels
 
-    data = Dataset(trainSet=[X_train,Y_train],validateSet=[X_validate,Y_validate],testSet=[X_test,Y_test])
-    l1 = Layer(784,'sigmoid','sigmoidProp')
-    l2 = Layer(512,'sigmoid','sigmoidProp')
-    l3 = Layer(256,'sigmoid','sigmoidProp')
-    l4 = Layer(64,'sigmoid','sigmoidProp')
-    l5 = Layer(10,'sigmoid','sigmoidProp')
-    layers = [l1,l2,l3,l4,l5]
+    data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate], testSet=[X_test, Y_test])
+    l1 = Layer(784, 'sigmoid', 'dSigmoid')
+    l2 = Layer(512, 'sigmoid', 'dSigmoid')
+    l3 = Layer(256, 'sigmoid', 'dSigmoid')
+    l4 = Layer(64, 'sigmoid', 'dSigmoid')
+    l5 = Layer(10, 'sigmoid', 'dSigmoid')
+    layers = [l1, l2, l3, l4, l5]
     para = Setting(layers=layers, batch=1, epoch=10)
     model = SGD(data, para)
     model.train()
