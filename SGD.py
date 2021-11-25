@@ -3,7 +3,6 @@ from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
 from Model import Model
-from Utility import sigmoid, dSigmoid, hardlim
 from scipy.io import loadmat
 
 
@@ -31,15 +30,16 @@ class SGD(Model):
                 # forward computation
                 for l in range(0, L-1):
                     self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                    self.layers[l+1].a = eval(self.layers[l].activation)(self.layers[l+1].z)
+                    # self.layers[l+1].a = eval(self.layers[l].activation)(self.layers[l+1].z)
+                    self.layers[l+1].a = self.layers[l].activation(self.layers[l+1].z)
                     # print(l, self.layers[l+1].a.shape)
                 # backward computation
                 self.layers[L-1].delta = self.dCostFunction(self.layers[L-1].a, y) * \
-                    eval(self.layers[L-1].dactivation)(self.layers[L-1].z)
+                    self.layers[L-1].dactivation(self.layers[L-1].z)
                 # print(self.layers[L-1].delta.shape)
                 for l in range(L - 2, 0, -1):
                     self.layers[l].delta = np.dot(self.weight[l+1].T, self.layers[l+1].delta) \
-                                           * eval(self.layers[l].dactivation)(self.layers[l].z)
+                                           * self.layers[l].dactivation(self.layers[l].z)
                 # weights update
                 for l in range(0, L-1):
                     # print(self.layers[l + 1].delta.shape)
@@ -49,7 +49,7 @@ class SGD(Model):
             self.layers[0].a = self.trainData
             for l in range(0, L - 1):
                 self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                self.layers[l + 1].a = eval(self.layers[l].activation)(self.layers[l + 1].z)
+                self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
             # print(self.calculateAccuracy(self.layers[L-1].a, self.trainLabel))
             self.trainOutputs.append(self.layers[L-1].a)
             # print(accuracy(self.trainOutputs[-1],self.trainLabel))
@@ -57,7 +57,7 @@ class SGD(Model):
             self.layers[0].a = self.validateData
             for l in range(0, L - 1):
                 self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                self.layers[l + 1].a = eval(self.layers[l].activation)(self.layers[l + 1].z)
+                self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
             self.validateOutputs.append(self.layers[L - 1].a)
             print('%d/%d train acc: %.4f | validate acc: %.4f' %
                   (epoch_num + 1, self.epoch, self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
@@ -66,7 +66,7 @@ class SGD(Model):
         self.layers[0].a = self.testData
         for l in range(0, L - 1):
             self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-            self.layers[l + 1].a = eval(self.layers[l].activation)(self.layers[l + 1].z)
+            self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
         self.testResult = self.layers[L-1].a
         # train result
         self.trainResult = self.trainOutputs[-1]
@@ -91,11 +91,11 @@ if __name__ == '__main__':
     Y_test = testLabels
 
     data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate], testSet=[X_test, Y_test])
-    l1 = Layer(784, 'sigmoid', 'dSigmoid')
-    l2 = Layer(512, 'sigmoid', 'dSigmoid')
-    l3 = Layer(256, 'sigmoid', 'dSigmoid')
-    l4 = Layer(64, 'sigmoid', 'dSigmoid')
-    l5 = Layer(10, 'sigmoid', 'dSigmoid')
+    l1 = Layer(784, 'sigmoid')
+    l2 = Layer(512, 'sigmoid')
+    l3 = Layer(256, 'sigmoid')
+    l4 = Layer(64, 'sigmoid')
+    l5 = Layer(10, 'sigmoid')
     layers = [l1, l2, l3, l4, l5]
     para = Setting(layers=layers, batch=1, epoch=10)
     model = SGD(data, para)

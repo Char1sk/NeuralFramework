@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from Dataset import Dataset
 from Setting import Setting
 import Utility as ut
@@ -23,10 +22,28 @@ class Model():
         # 设置模型参数
         self.depth = setting.depth
         self.layers = setting.layers
+        for l in self.layers:
+            (l.activation, l.dactivation) = self.strToFunc(l.activation)
         self.batch = setting.batch
         self.alpha = setting.alpha
         self.epoch = setting.epoch
-        self.weight = setting.weight
+        self.initialize = setting.initialize
+        self.weight = {}
+        if self.initialize == 'normal':
+            for l in range(1, self.depth):
+                self.weight[l] = 0.1 * np.random.randn(self.layers[l].count, self.layers[l-1].count)
+        elif self.initialize == 'uniform':
+            for l in range(1, self.depth):
+                self.weight[l] = 0.1 * np.random.uniform(0, 1, (self.layers[l].count, self.layers[l-1].count))
+        elif self.initialize == 'xavier':
+            for l in range(1, self.depth):
+                bound = np.sqrt(6./(self.layers[l] + self.layers[l-1]))
+                self.weight[l] = np.random.uniform(-bound, bound, (self.layers[l].count, self.layers[l-1].count))
+        elif self.initialize == 'zero':
+            for l in range(1, self.depth):
+                self.weight[l] = 0.1 * np.zeros((self.layers[l].count, self.layers[l-1].count))
+        else:  # 输入错误
+            pass
         self.bias = 0  # 暂用!!!!!!!!!!
         (self.costFunction, self.dCostFunction) = self.strToFunc(setting.costFunction)
         # 混淆矩阵，计算指标时的中间结果
@@ -44,6 +61,8 @@ class Model():
         self.testResult = None
 
     def strToFunc(self, funcname):
+        if funcname == 'sigmoid':
+            return (ut.sigmoid, ut.dSigmoid)
         if funcname == 'meanSquareError':
             return (ut.meanSquareError, ut.dMeanSquareError)
         if funcname == 'crossEntropy':
@@ -59,59 +78,6 @@ class Model():
             self.trainOutputs.append(self.getOutput(self.trainData, self.trainLabel))
             self.validateOutputs.append(self.getOutput(self.validateData, self.validateLabel))
             # UPDATE: 更新权值
-
-    ##################
-    ##################
-    # 展  示  使  用  #
-    # 二分类感知机
-    # 更新weight,bias
-    # 每一次的pred填入trainOutputs
-    # 更新完成后再算一次pred填入trainResult
-    def PerceptronTrain(self):
-        print("#### PerceptronTrain Begin ####\n")
-        for epoch in range(self.epoch):  #
-            print("epoch{:<3d}: w = {}, b = {}".format(epoch, self.weight[1],
-                                                       self.bias))
-            error = np.zeros((1, self.trainData.shape[1]))
-            for i in range(self.trainData.shape[1]):
-                pred = self.hardlim(
-                    np.dot(self.weight[1], self.trainData[:, i:i + 1]) +
-                    self.bias)
-                error[:, i] = self.trainLabel[:, i:i + 1] - pred
-
-                self.weight[1] += np.dot(error[:, i:i + 1],
-                                         self.trainData[:, i:i + 1].T)
-                self.bias += error[:, i:i + 1]
-                self.trainOutputs.append(pred)
-                print(pred, "<->", self.trainLabel[:, i:i + 1])
-
-            if error.max() == 0 and error.min() == 0:  # 分类完全正确
-                break
-        print("\n#### PerceptronTrain End ####")
-        pred = np.zeros((self.trainLabel.shape))
-        for i in range(self.trainData.shape[1]):
-            pred[:, i] = self.hardlim(
-                np.dot(self.weight[1], self.trainData[:, i:i + 1]) + self.bias)
-        self.trainResult = pred
-
-    # 非线性激活函数
-    def hardlim(self, x):
-        x = np.where(x > 0, 1, 0)
-        return x
-
-    # 分类面展示
-    def draw(self, data, label):
-        plt.xlim(-2, 2)
-        plt.ylim(-2, 2)
-        plt.scatter(data[0, :], data[1, :], c=label[0, :])
-        x = np.array([-2, 2])
-        y = -(self.weight[1][:, 0] * x + self.bias) / self.weight[1][:, 1]
-        plt.plot(x, y.reshape(2, ), c='r')
-        plt.show()
-
-    # 展  示  使  用  #
-    ##################
-    ##################
 
     # 进行训练完成后的测试，保存测试结果
     def model(self):

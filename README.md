@@ -89,7 +89,13 @@
 
 ## TODO
 
-- 重构权值初始化的位置
-- 重构Layer的activation
+- 覆盖getOutput
 - 重构一下感知机？
-- 加入时间测试代码
+- 加入时间测试代码？
+- 搞一个运用文件的大测试？
+
+## DONE
+
+- weight移动到Model.init中初始化
+- Setting的保存和读取重构为json，而非npz
+- Layer初始化去掉dactivation, 在model.init中分配

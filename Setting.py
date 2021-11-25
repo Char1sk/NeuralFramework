@@ -7,7 +7,8 @@
 # 好处：
 # 把参数和模型、数据分离，解耦合
 # 可以把一组参数复用给多个模型
-import numpy as np
+from Layer import Layer
+import json
 
 
 class Setting():
@@ -27,56 +28,39 @@ class Setting():
         self.epoch = epoch
         self.initialize = initialize
         self.costFunction = costFunction
-        # TODO:
-        # 此处依据初始化方式进行初始化
-        # 目前有 normal uniform xavier
-        self.weight = {}
-        if initialize == 'normal':
-            for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.randn(layers[l].count, layers[l-1].count)
-        elif initialize == 'uniform':
-            for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.uniform(0, 1, (layers[l].count, layers[l-1].count))
-        elif initialize == 'xavier':
-            for l in range(1, self.depth):
-                bound = np.sqrt(6./(layers[l] + layers[l-1]))
-                self.weight[l] = np.random.uniform(-bound, bound, (layers[l].count, layers[l-1].count))
-        elif initialize == 'zero':
-            for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.zeros((layers[l].count, layers[l-1].count))
-        else:  # 输入错误
-            pass
 
     # 把自身设置保存到文件(文件结构方便读取和保存就行)
     # @param path: 保存文件的路径名
     def saveSetting(self, path):
-        np.savez(path, layers=self.layers, batch=self.batch, alpha=self.alpha, epoch=self.epoch, initialize=self.initialize)
-        print("param saved to {}.npz".format(path))
+        # np.savez(path, layers=self.layers, batch=self.batch, alpha=self.alpha, epoch=self.epoch, initialize=self.initialize)
+        dictSetting = self.__dict__.copy()
+        dictSetting['layers'] = []
+        for l in self.layers:
+            ld = {
+                'count': l.count,
+                'activation': l.activation
+            }
+            dictSetting['layers'].append(ld)
+        with open(path, 'w') as f:
+            json.dump(dictSetting, f)
+            print("parameters saved to {}".format(path))
 
     # 先清空原设置，再从已有文件读取设置，直接更改自身成员
     # @param path: 读取文件的路径名
     def loadSetting(self, path):
-        t = np.load(path)
-        self.layers = t['layers']
-        self.depth = len(self.layers)
-        self.batch = t['batch']
-        self.alpha = t['alpha']
-        self.epoch = t['epoch']
-        self.initialize = t['initialize']
-        initialize = t['initialize']
+        with open(path, 'r') as f:
+            dictSetting = json.load(f)
+            print("parameters loaded from {}".format(path))
 
-        if initialize == 'normal':
-            for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.randn(self.layers[l], self.layers[l-1])
-        elif initialize == 'uniform':
-            for l in range(1, self.depth):
-                self.weight[l] = 0.1 * np.random.uniform(0, 1, (self.layers[l], self.layers[l-1]))
-        elif initialize == 'xavier':
-            for l in range(1, self.depth):
-                bound = np.sqrt(6./(self.layers[l] + self.layers[l-1]))
-                self.weight[l] = np.random.uniform(-bound, bound, (self.layers[l], self.layers[l-1]))
-        else:  # 输入错误
-            pass
+        self.layers = []
+        for dl in dictSetting['layers']:
+            self.layers.append(Layer(dl['count'], dl['activation']))
+        self.depth = len(self.layers)
+        self.batch = dictSetting['batch']
+        self.alpha = dictSetting['alpha']
+        self.epoch = dictSetting['epoch']
+        self.initialize = dictSetting['initialize']
+        self.costFunction = dictSetting['costFunction']
 
     # DEBUG:
     # 输出所有成员
@@ -87,3 +71,16 @@ class Setting():
         print('alpha =', self.alpha)
         print('epoch =', self.epoch)
         print('initialize =', self.initialize)
+        print('costFunction =', self.costFunction)
+
+
+if __name__ == '__main__':
+    layer1 = Layer(4, 'sigmoid')
+    layer2 = Layer(5, 'sigmoid')
+    layer3 = Layer(6, 'linear')
+    layers = [layer1, layer2, layer3]
+    setting = Setting(layers=layers, batch=5, alpha=1, epoch=50, initialize='xavier', costFunction='crossEntropy')
+    setting.saveSetting('./testSetting.json')
+    newSetting = Setting()
+    newSetting.loadSetting('./testSetting.json')
+    newSetting.ParamShow()
