@@ -207,8 +207,12 @@ class Model():
     # @param data: 输入数据
     # @param label: 目标标签
     # @return output: 预测的结果(网络输出)
-    def getOutput(self, data, label):
-        pass
+    def getOutput(self, data):
+        self.layers[0].a = data
+        for l in range(0, self.depth - 1):
+            self.layers[l + 1].z = np.dot(self.weight[l + 1], self.layers[l].a)
+            self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
+        return self.layers[self.depth - 1].a
 
 
 if __name__ == '__main__':

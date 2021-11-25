@@ -42,32 +42,17 @@ class SGD(Model):
                                            * self.layers[l].dactivation(self.layers[l].z)
                 # weights update
                 for l in range(0, L-1):
-                    # print(self.layers[l + 1].delta.shape)
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)
                     self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
             # train process
-            self.layers[0].a = self.trainData
-            for l in range(0, L - 1):
-                self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
-            # print(self.calculateAccuracy(self.layers[L-1].a, self.trainLabel))
-            self.trainOutputs.append(self.layers[L-1].a)
-            # print(accuracy(self.trainOutputs[-1],self.trainLabel))
+            self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
-            self.layers[0].a = self.validateData
-            for l in range(0, L - 1):
-                self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
-            self.validateOutputs.append(self.layers[L - 1].a)
+            self.validateOutputs.append(self.getOutput(self.validateData))
             print('%d/%d train acc: %.4f | validate acc: %.4f' %
                   (epoch_num + 1, self.epoch, self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
                    self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel)))
         # test result
-        self.layers[0].a = self.testData
-        for l in range(0, L - 1):
-            self.layers[l + 1].z = np.dot(self.weight[l+1], self.layers[l].a)
-            self.layers[l + 1].a = self.layers[l].activation(self.layers[l + 1].z)
-        self.testResult = self.layers[L-1].a
+        self.testResult = self.getOutput(self.testData)
         # train result
         self.trainResult = self.trainOutputs[-1]
         # validate result
