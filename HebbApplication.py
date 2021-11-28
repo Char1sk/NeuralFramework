@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from HebbModel import HebbModel
 from Dataset import Dataset
 from Setting import Setting
+from Layer import Layer
 
 
 def testZero(WeightMatrix):  # 用0图像上半部分进行测试
@@ -123,7 +124,7 @@ data = np.array([[-1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, -1, 1, 1, -1, -1
 label = data
 
 data = Dataset(allSet=[data.T, label.T])
-s = Setting([30,30],initialize='zero')
+s = Setting([Layer(30, 'linear'), Layer(30, 'linear')], initialize='zero')
 model = HebbModel(data, s)
 model.trainData = data.allData
 model.trainLabel = data.allLabel

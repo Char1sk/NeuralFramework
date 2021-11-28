@@ -1,6 +1,7 @@
 import numpy as np
 from Dataset import Dataset
 from Setting import Setting
+from Layer import Layer
 from Model import Model
 import Utility as ut
 
@@ -29,7 +30,8 @@ if __name__ == '__main__':
     label = data
 
     data = Dataset(allSet=[data.T, label.T])
-    s = Setting([4,4],initialize='zero')
+    # s = Setting([4,4],initialize='zero')
+    s = Setting([Layer(4,'linear'), Layer(4,'linear')], initialize='zero')
     model = HebbModel(data, s)
     model.trainData = data.allData
     model.trainLabel = data.allLabel

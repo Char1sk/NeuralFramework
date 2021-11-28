@@ -23,7 +23,7 @@ class Model():
         self.depth = setting.depth
         self.layers = setting.layers
         for l in self.layers:
-            (l.activation, l.dactivation) = self.strToFunc(l.activation)
+            (l.activation, l.dactivation) = ut.strToFunc(l.activation)
         self.batch = setting.batch
         self.alpha = setting.alpha
         self.epoch = setting.epoch
@@ -45,7 +45,7 @@ class Model():
         else:  # 输入错误
             pass
         self.bias = 0  # 暂用!!!!!!!!!!
-        (self.costFunction, self.dCostFunction) = self.strToFunc(setting.costFunction)
+        (self.costFunction, self.dCostFunction) = ut.strToFunc(setting.costFunction)
         # 混淆矩阵，计算指标时的中间结果
         self.confusionMatrix = None
         # 训练过程中，训练集和验证集的预测结果
@@ -60,13 +60,13 @@ class Model():
         self.validateResult = None
         self.testResult = None
 
-    def strToFunc(self, funcname):
-        if funcname == 'sigmoid':
-            return (ut.sigmoid, ut.dSigmoid)
-        if funcname == 'meanSquareError':
-            return (ut.meanSquareError, ut.dMeanSquareError)
-        if funcname == 'crossEntropy':
-            return (ut.softmaxCrossEntropy, ut.dSoftmaxCrossEntropy)
+    # def strToFunc(self, funcname):
+    #     if funcname == 'sigmoid':
+    #         return (ut.sigmoid, ut.dSigmoid)
+    #     if funcname == 'meanSquareError':
+    #         return (ut.meanSquareError, ut.dMeanSquareError)
+    #     if funcname == 'crossEntropy':
+    #         return (ut.softmaxCrossEntropy, ut.dSoftmaxCrossEntropy)
 
     # UPDATE: 以后写训练的时候再来改，函数只是表明有这个步骤
     # 进行迭代训练过程，更新权重，记录中间结果
