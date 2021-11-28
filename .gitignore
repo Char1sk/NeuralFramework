@@ -3,5 +3,4 @@
 *.mat
 *.pkl
 *.npz
-*.json
 __pycache__
