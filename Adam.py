@@ -4,6 +4,9 @@ from Dataset import Dataset
 from Setting import Setting
 from Model import Model
 from scipy.io import loadmat
+import time
+#import Utility as ut 
+import UtilityJit as ut 
 
 
 class ForwardNetwork(Model):
@@ -22,6 +25,7 @@ class ForwardNetwork(Model):
              mt[l] = np.zeros((self.layers[l].count, self.layers[l-1].count))##梯度一阶矩阵
              vt[l] = np.zeros((self.layers[l].count, self.layers[l-1].count))#梯度二阶矩阵
         for epoch_num in range(self.epoch):
+            startTime = time.time()
             order = np.random.permutation(train_size)
             for k in range(int(train_size/self.batch)):       
                 start = k * self.batch
@@ -45,20 +49,26 @@ class ForwardNetwork(Model):
                     # print(self.layers[l + 1].delta.shape)
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)/m
 
-                    mt[l+1]  = b1 *mt[l+1]+(1-b1)*grad_w
-                    vt[l+1]  = b2 *vt[l+1] + (1-b2)*(grad_w**2)
-          
-                    mtt = mt[l+1]/(1-(b1**(k+1)))###mt的偏置矫正
-                    vtt = vt[l+1]/(1-(b2**(k+1)))##vt的偏置矫正
+                    mt[l+1]  = ut.updateMT(mt[l+1], b1,grad_w)
+                    vt[l+1]  = ut.updateVT(vt[l+1], b2, grad_w)
+                    
+                    mtt = ut.updateMTT(mt[l+1], b1, k)###mt的偏置矫正
+                    vtt = ut.updateVTT(vt[l+1], b2, k)##vt的偏置矫正
 
-                    self.weight[l+1] -=    self.alpha * mtt / (np.sqrt(vtt) + 1e-8)
+                    #self.weight[l+1] -=    self.alpha * mtt / (np.sqrt(vtt) + 1e-8)
+                    self.weight[l+1] = ut.updateWeightAdam(self.weight[l+1], self.alpha, mtt, vtt)
+
             # train process
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
             self.validateOutputs.append(self.getOutput(self.validateData))
-            print('%d/%d train acc: %.4f | validate acc: %.4f' %
-                  (epoch_num + 1, self.epoch, self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
-                   self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel)))
+            endTime = time.time()
+
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
+                .format(epoch_num + 1, self.epoch, 
+                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                endTime - startTime))
         # test result
         self.testResult = self.getOutput(self.testData)
         # train result

@@ -3,7 +3,8 @@ from Dataset import Dataset
 from Setting import Setting
 from Layer import Layer
 from Model import Model
-import Utility as ut
+#import Utility as ut
+import UtilityJit as ut 
 
 class HebbModel(Model):
     

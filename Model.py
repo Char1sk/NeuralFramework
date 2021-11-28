@@ -1,8 +1,8 @@
 import numpy as np
 from Dataset import Dataset
 from Setting import Setting
-import Utility as ut
-
+#import Utility as ut
+import UtilityJit as ut 
 
 class Model():
     # UPDATE: 有新的参数等直接新增即可
@@ -44,6 +44,7 @@ class Model():
                 self.weight[l] = 0.1 * np.zeros((self.layers[l].count, self.layers[l-1].count))
         else:  # 输入错误
             pass
+
         self.bias = 0  # 暂用!!!!!!!!!!
         (self.costFunction, self.dCostFunction) = ut.strToFunc(setting.costFunction)
         # 混淆矩阵，计算指标时的中间结果

@@ -4,7 +4,9 @@ from Dataset import Dataset
 from Setting import Setting
 from Model import Model
 from scipy.io import loadmat
-
+import time
+#import Utility as ut 
+import UtilityJit as ut 
 
 def accuracy(a, y):
     mini_batch = a.shape[1]
@@ -23,6 +25,7 @@ class SGD(Model):
         train_size = self.trainData.shape[1]
         L = self.depth
         for epoch_num in range(self.epoch):
+            startTime = time.time()
             idxs = np.random.permutation(train_size)
             for k in idxs:       # SGD形式，每次只选择一个样本求更新结果
                 self.layers[0].a = self.trainData[:, k].reshape(-1, 1)
@@ -43,14 +46,19 @@ class SGD(Model):
                 # weights update
                 for l in range(0, L-1):
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)
-                    self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
+                    #self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
+                    self.weight[l+1]=ut.updateWeight(self.weight[l+1], self.alpha, grad_w)
             # train process
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
             self.validateOutputs.append(self.getOutput(self.validateData))
-            print('%d/%d train acc: %.4f | validate acc: %.4f' %
-                  (epoch_num + 1, self.epoch, self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
-                   self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel)))
+            endTime = time.time()
+
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
+                .format(epoch_num + 1, self.epoch, 
+                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                endTime - startTime))
         # test result
         self.testResult = self.getOutput(self.testData)
         # train result
