@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit,vectorize, float64
+from numba import jit
 import time
 
 
