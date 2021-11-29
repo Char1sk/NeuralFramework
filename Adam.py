@@ -10,7 +10,7 @@ import time
 import UtilityJit as ut 
 
 
-class ForwardNetwork(Model):
+class Adam(Model):
     # 一般没有什么额外设置，如有则在Setting里添加
     def __init__(self, dataset, setting):
         super().__init__(dataset, setting)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     l5 = Layer(10, 'sigmoid')
     layers = [l1, l2, l3, l4, l5]
     para = Setting(layers=layers, batch=100, epoch=100, alpha=0.005)##学习率要偏小些效果才好
-    model = ForwardNetwork(data, para)
+    model = Adam(data, para)
     model.train()
     print("Accuracy  = {:<.4f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
     print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))

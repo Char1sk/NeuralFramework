@@ -195,7 +195,7 @@ if __name__ == '__main__':
     l4 = Layer(64, 'sigmoid')
     l5 = Layer(10, 'sigmoid')
     layers = [l1, l2, l3, l4, l5]
-    para = Setting(layers=layers, batch=100, epoch=100, alpha=0.01)
+    para = Setting(layers=layers, batch=100, epoch=10, alpha=0.01)
     model = Momentum(data, para)
     model.train()
     print("Accuracy  = {:<.4f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
