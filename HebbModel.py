@@ -1,10 +1,14 @@
 import numpy as np
+from numpy.core.fromnumeric import shape
 from Dataset import Dataset
 from Setting import Setting
 from Layer import Layer
 from Model import Model
 #import Utility as ut
 import UtilityJit as ut 
+import matplotlib
+import matplotlib.pyplot as plt
+import math
 
 class HebbModel(Model):
     
@@ -22,12 +26,32 @@ class HebbModel(Model):
             pred[:, i:i+1] = ut.hardlims(np.dot(self.weight[1], self.trainData[:, i:i + 1]))
         self.trainResult = pred
 
+def draw(trainResult):
+    for k in range (trainResult.shape[1]):
+        output = trainResult[:,k]
+        for i in range(output.size):
+            if(output[i]>=0):
+                output[i] = 1
+            else:
+                output[i] = -1
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        for i in range(output.size):
+            j = i % 2
+            if(output[i]== -1):
+                rect = matplotlib.patches.Rectangle((0+j*10,10-math.floor(i/2)*10), 10, 10, color='yellow')
+            else:
+                rect = matplotlib.patches.Rectangle((0+j*10,10-math.floor(i/2)*10), 10, 10, color='red')
+            ax.add_patch(rect)
+        plt.xlim([0, 20])
+        plt.ylim([0, 20])
+        plt.show()
 
 
 if __name__ == '__main__':
-    data = np.array([[1, -1, 1, 1],
-                     [1, 1, -1, 1],
-                     [-1, -1, -1, 1]],)
+    data = np.array([[1., -1., 1., 1.],
+                     [1., 1., -1., 1.],
+                     [-1., -1., -1., 1.]],)
     label = data
 
     data = Dataset(allSet=[data.T, label.T])
@@ -40,6 +64,4 @@ if __name__ == '__main__':
     model.train()
     np.set_printoptions(precision=2, floatmode='fixed', suppress=True)
     print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
-    print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
-    print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
-    print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
+    draw(model.trainResult)
