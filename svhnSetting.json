@@ -1,0 +1,22 @@
+{
+    "depth": 3,
+    "layers": [
+        {
+            "count": 1024,
+            "activation": "sigmoid"
+        },
+        {
+            "count": 256,
+            "activation": "sigmoid"
+        },
+        {
+            "count": 10,
+            "activation": "sigmoid"
+        }
+    ],
+    "batch": 1,
+    "alpha": 0.1,
+    "epoch": 5,
+    "initialize": "normal",
+    "costFunction": "crossEntropy"
+}
