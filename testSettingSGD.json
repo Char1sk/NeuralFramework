@@ -1,0 +1,1 @@
+{"depth": 5, "layers": [{"count": 784, "activation": "sigmoid"}, {"count": 512, "activation": "sigmoid"}, {"count": 256, "activation": "sigmoid"}, {"count": 64, "activation": "sigmoid"}, {"count": 10, "activation": "sigmoid"}], "batch": 1, "alpha": 0.01, "epoch": 10, "initialize": "normal", "costFunction": "meanSquareError"}
