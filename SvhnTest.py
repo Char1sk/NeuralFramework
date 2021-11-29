@@ -4,7 +4,7 @@ from scipy.io import loadmat
 from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
-
+import matplotlib.pyplot as plt
 
 def rgbtogray(x):
     r=x[:,:,2,:]
@@ -67,3 +67,11 @@ print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, m
 print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
 print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
 print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
+
+plt.grid(axis='y',linestyle='-.')
+plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
+plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
+plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+plt.title("Accuracy")
+plt.legend()
+plt.show()
