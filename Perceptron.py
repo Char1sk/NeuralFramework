@@ -1,10 +1,12 @@
 import numpy as np
-from Layer import Layer
 import matplotlib.pyplot as plt
+from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
 from Model import Model
-#import Utility as ut
+from scipy.io import loadmat
+import math,time
+#import Utility as ut 
 import UtilityJit as ut 
 
 class Perceptron(Model):
@@ -14,64 +16,78 @@ class Perceptron(Model):
 
     # 此处直接从PerceptronTrain复制的
     def train(self):
-        print("#### PerceptronTrain Begin ####\n")
-        for epoch in range(self.epoch):  #
-            print("epoch{:<3d}: w = {}, b = {}".format(epoch, self.weight[1], self.bias))
-            error = np.zeros((1, self.trainData.shape[1]))
-            for i in range(self.trainData.shape[1]):
-                pred = ut.hardlim(np.dot(self.weight[1], self.trainData[:, i:i + 1]) + self.bias)
-                error[:, i] = self.trainLabel[:, i:i + 1] - pred
 
-                self.weight[1] += np.dot(error[:, i:i + 1], self.trainData[:, i:i + 1].T)
-                self.bias += error[:, i:i + 1]
-                self.trainOutputs.append(pred)
-                print(pred, "<->", self.trainLabel[:, i:i + 1])
+        train_size = self.trainData.shape[1]
+        for epoch_num in range(self.epoch):  
+            
+            idxs = np.random.permutation(train_size)
+            right = 0    
+            
+            startTime = time.time()
+            for k in range(math.ceil(train_size/self.batch)):      
+                start_idx = k*self.batch 
+                end_idx = min((k+1)*self.batch, train_size)           
+                batch_indices = idxs[start_idx:end_idx]
 
-            if error.max() == 0 and error.min() == 0:  # 分类完全正确
-                break
-        print("\n#### PerceptronTrain End ####")
-        pred = np.zeros((self.trainLabel.shape))
-        for i in range(self.trainData.shape[1]):
-            pred[:, i] = ut.hardlim(np.dot(self.weight[1], self.trainData[:, i:i + 1]) + self.bias)
-        self.trainResult = pred
+                self.layers[0].a = self.trainData[:, batch_indices]
+                y = self.trainLabel[:, batch_indices]
+                
+                self.layers[1].a=ut.hardlim(np.dot(self.weight[1], self.layers[0].a)+self.bias)
+                error=y-self.layers[1].a
+                #loss+=np.sum(error**2)            
+                
+                grad_w = -np.dot(error, self.layers[0].a.T)
+                self.weight[1] = ut.updateWeight(self.weight[1], self.alpha, grad_w) 
+                self.bias = self.bias + self.alpha*np.sum(error,axis=1).reshape(10,1)
 
+            # train process
+            self.trainOutputs.append(self.getOutput(self.trainData))
+            # validate process
+            self.validateOutputs.append(self.getOutput(self.validateData))
 
-## 这部分属于用户自己操作，我们不用实现
-#def draw(data, label):
-#    plt.xlim(-2, 2)
-#    plt.ylim(-2, 2)
-#    plt.scatter(data[0, :], data[1, :], c=label[0, :])
-#    x = np.array([-2, 2])
-#    y = -(self.weight[1][:, 0] * x + self.bias) / self.weight[1][:, 1]
-#    plt.plot(x, y.reshape(2, ), c='r')
-#    plt.show()
+            endTime = time.time()
+
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
+                .format(epoch_num + 1, self.epoch, 
+                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                endTime - startTime))
+        # test result
+        #self.testResult = self.getOutput(self.testData)
+        # train result
+        self.trainResult = self.trainOutputs[-1]
+        # validate result
+        self.validateResult = self.validateOutputs[-1]
+
 
 
 if __name__ == '__main__':
-    # 二分类感知机测试
-    # data为二维坐标，label为0/1
-    # 对应模型层数为2，2输入1输出
-    data = np.array([[0, 0],
-                     [1, 0],
-                     [0, 1],
-                     [1, 1]])
-    label = np.array([[1, 1, 1, 0]])
-    # 数据过少不进行分划
-    data = Dataset(allSet=[data.T, label])
-    # 只需额外定义layers
-    l1 = Layer(2, 'hardlim')
-    l2 = Layer(1, 'hardlim')
+
+    m = loadmat("./mnist_small_matlab.mat")
+    trainData, trainLabels = m['trainData'], m['trainLabels']
+    testData, testLabels = m['testData'], m['testLabels']
+    train_size = 10000
+    X_all = trainData.reshape(-1, train_size)
+    X_train = X_all[:, :8000]
+    Y_train = trainLabels[:, :8000]
+    val_size = 2000
+    X_validate = X_all[:, 8000:]
+    Y_validate = trainLabels[:, 8000:]
+    test_size = 2000
+    X_test = testData.reshape(-1, test_size)
+    Y_test = testLabels
+
+    data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate], testSet=[X_test, Y_test])
+    l1 = Layer(784, 'hardlim')
+    l2 = Layer(10, 'hardlim')
     layers = [l1, l2]
-    s = Setting(layers=layers)
-    model = Perceptron(data, s)
-    # 把全部数据都用作模型训练集
-    model.trainData = data.allData
-    model.trainLabel = data.allLabel
-    # 感知机训练
+    para = Setting(layers=layers, batch=100, epoch=10, alpha=0.1)
+    model = Perceptron(data, para)
     model.train()
-    np.set_printoptions(precision=2, floatmode='fixed', suppress=True)
-    print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
+    #print(model.calculateAccuracy(model.trainOutputs, model.trainLabel))
+    print("Accuracy  = {:<.4f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
     print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
-    #draw(model.trainData, model.trainLabel)    # 画出分类结果
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel))
+    plt.show()

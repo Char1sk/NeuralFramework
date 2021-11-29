@@ -4,6 +4,7 @@ from Setting import Setting
 #import Utility as ut
 import UtilityJit as ut 
 
+
 class Model():
     # UPDATE: 有新的参数等直接新增即可
     # DISCUSS 是直接保存dataset/setting对象，还是拷贝其成员？
