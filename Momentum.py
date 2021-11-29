@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
@@ -150,6 +151,8 @@ class Momentum(Model):
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
             self.validateOutputs.append(self.getOutput(self.validateData))
+            # test process
+            self.testOutputs.append(self.getOutput(self.testData))
 
             endTime = time.time()
 
@@ -158,15 +161,15 @@ class Momentum(Model):
                 self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
                 self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
                 endTime - startTime))
-
         # test result
-        self.testResult = self.getOutput(self.testData)
+        self.testResult = self.testOutputs[-1]
         # train result
         self.trainResult = self.trainOutputs[-1]
         # validate result
         self.validateResult = self.validateOutputs[-1]
-        end = time.time()
-        print("{:.4f}s".format(end-start))
+
+        end = time.time()         
+        print("globaltime={}s".format(end-start))
 
 
 if __name__ == '__main__':
@@ -195,8 +198,16 @@ if __name__ == '__main__':
     para = Setting(layers=layers, batch=100, epoch=100, alpha=0.01)
     model = Momentum(data, para)
     model.train()
-    print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
+    print("Accuracy  = {:<.4f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
     print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
+
+    plt.grid(axis='y',linestyle='-.')
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+    plt.title("Accuracy")
+    plt.legend()
+    plt.show()
 

@@ -16,7 +16,7 @@ class Perceptron(Model):
 
     # 此处直接从PerceptronTrain复制的
     def train(self):
-
+        start = time.time()
         train_size = self.trainData.shape[1]
         for epoch_num in range(self.epoch):  
             
@@ -44,6 +44,8 @@ class Perceptron(Model):
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
             self.validateOutputs.append(self.getOutput(self.validateData))
+            # test process
+            self.testOutputs.append(self.getOutput(self.testData))
 
             endTime = time.time()
 
@@ -53,12 +55,14 @@ class Perceptron(Model):
                 self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
                 endTime - startTime))
         # test result
-        #self.testResult = self.getOutput(self.testData)
+        self.testResult = self.testOutputs[-1]
         # train result
         self.trainResult = self.trainOutputs[-1]
         # validate result
         self.validateResult = self.validateOutputs[-1]
 
+        end = time.time()         
+        print("globaltime={}s".format(end-start))
 
 
 if __name__ == '__main__':
@@ -81,13 +85,20 @@ if __name__ == '__main__':
     l1 = Layer(784, 'hardlim')
     l2 = Layer(10, 'hardlim')
     layers = [l1, l2]
-    para = Setting(layers=layers, batch=100, epoch=10, alpha=0.1)
+    para = Setting(layers=layers, batch=100, epoch=100, alpha=0.01)
     model = Perceptron(data, para)
     model.train()
+    
     #print(model.calculateAccuracy(model.trainOutputs, model.trainLabel))
     print("Accuracy  = {:<.4f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
     print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel))
+
+    plt.grid(axis='y',linestyle='-.')
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
+    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+    plt.title("Accuracy")
+    plt.legend()
     plt.show()

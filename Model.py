@@ -55,6 +55,7 @@ class Model():
         # 在需要获取过程中指标时，再利用这些计算
         self.trainOutputs = []
         self.validateOutputs = []
+        self.testOutputs = []
         # 训练结束后，进行最后检验得到的输出
         # 在训练完后进行赋值，记录结果
         # 在需要获取相应指标时，再利用这些计算
