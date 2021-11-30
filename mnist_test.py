@@ -50,11 +50,10 @@ trainData ,trainLabels = load_mnist('mnist/')
 testData ,testLabels = load_mnist('mnist/',kind='t10k')
 
 train_size = 20000
-X_all = trainData
-X_train = X_all[:, :train_size]
+X_train = trainData[:, :train_size]
 Y_train = trainLabels[:, :train_size]
 val_size = 5000
-X_validate = X_all[:, val_size:]
+X_validate = trainData[:, val_size:]
 Y_validate = trainLabels[:, val_size:]
 test_size = 10000
 X_test = testData
@@ -62,14 +61,14 @@ Y_test = testLabels
 print(trainLabels.shape)
 data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate], testSet=[X_test, Y_test])
 para = Setting()
-#para.loadSetting('./testSettingForward.json')
+para.loadSetting('./testSettingForward.json')
 #para.loadSetting('./testSettingSGD.json')
 #para.loadSetting('./testSettingMomentum.json')
-para.loadSetting('./testSettingAdam.json')
-#model = ForwardNetwork(data, para)
+#para.loadSetting('./testSettingAdam.json')
+model = ForwardNetwork(data, para)
 #model = SGD(data, para)#1    0.01
 #model = Momentum(data, para)
-model= Adam(data, para)
+#model= Adam(data, para)
 model.train()
 
 
@@ -77,6 +76,13 @@ print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, m
 print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
 print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
 print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
+
+
+
+print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.testResult, model.testLabel)))
+print("Recall    = {}".format(model.calculateRecall(model.testResult,  model.testLabel)))
+print("Precision = {}".format(model.calculatePrecision(model.testResult,  model.testLabel)))
+print("F1Score   = {}".format(model.calculateF1Score(model.testResult,  model.testLabel)))
 
 
 plt.grid(axis='y',linestyle='-.')
