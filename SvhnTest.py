@@ -1,40 +1,44 @@
 import numpy as np
 from SGD import SGD
+from ForwardNetwork import ForwardNetwork
+from Adam import Adam
 from scipy.io import loadmat
-from Layer import Layer
+# from Layer import Layer
 from Dataset import Dataset
 from Setting import Setting
 import matplotlib.pyplot as plt
 
+
 def rgbtogray(x):
-    r=x[:,:,2,:]
-    g=x[:,:,1,:]
-    b=x[:,:,0,:]
+    r = x[:, :, 2, :]
+    g = x[:, :, 1, :]
+    b = x[:, :, 0, :]
     y = (0.299*r+0.587*g+0.114*b)/255
     return y
 
+
 m = loadmat(r"svhn_train_32x32.mat")
 tData, tLabels = m['X'], m['y']
-trainLabels=np.zeros((10,len(tLabels)))
-for i in range(len(tLabels)) :
-    t = [0,0,0,0,0,0,0,0,0,0]
+trainLabels = np.zeros((10, len(tLabels)))
+for i in range(len(tLabels)):
+    t = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     if tLabels[i] == 10:
-        t[0]=1
+        t[0] = 1
     else:
-        t[int(tLabels[i])]=1
-    trainLabels[:,i]=t
+        t[int(tLabels[i])] = 1
+    trainLabels[:, i] = t
 trainData = rgbtogray(tData)
 
 m = loadmat(r"svhn_test_32x32.mat")
 tData, tLabels = m['X'], m['y']
-testLabels=np.zeros((10,len(tLabels)))
-for i in range(len(tLabels)) :
-    t = [0,0,0,0,0,0,0,0,0,0]
+testLabels = np.zeros((10, len(tLabels)))
+for i in range(len(tLabels)):
+    t = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     if tLabels[i] == 10:
-        t[0]=1
+        t[0] = 1
     else:
-        t[int(tLabels[i])]=1
-    testLabels[:,i]=t
+        t[int(tLabels[i])] = 1
+    testLabels[:, i] = t
 testData = rgbtogray(tData)
 
 
@@ -61,17 +65,19 @@ data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate]
 para = Setting()
 para.loadSetting(r"svhnSetting.json")
 
-model = SGD(data, para)
+# model = SGD(data, para)
+model = Adam(data, para)
+print("Training begin.")
 model.train()
 print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))
 print("Recall    = {}".format(model.calculateRecall(model.trainResult, model.trainLabel)))
 print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
 print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
 
-plt.grid(axis='y',linestyle='-.')
-plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
-plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
-plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+plt.grid(axis='y', linestyle='-.')
+plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.trainOutputs, model.trainLabel), label="train", c="b")
+plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.testOutputs, model.testLabel), label="test", c="r")
+plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.validateOutputs, model.validateLabel), label="valid", c="y")
 plt.title("Accuracy")
 plt.legend()
 plt.show()

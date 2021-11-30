@@ -16,7 +16,7 @@
     ],
     "batch": 1,
     "alpha": 0.1,
-    "epoch": 5,
+    "epoch": 50,
     "initialize": "normal",
     "costFunction": "crossEntropy"
 }

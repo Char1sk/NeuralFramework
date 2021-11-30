@@ -5,10 +5,10 @@ from Dataset import Dataset
 from Setting import Setting
 from Model import Model
 from scipy.io import loadmat
-import math,time
-#import Utility as ut 
-import UtilityJit as ut 
-
+import math
+import time
+# import Utility as ut
+import UtilityJit as ut
 
 
 def accuracy(a, y):
@@ -28,10 +28,10 @@ class Momentum(Model):
     @jit
     def jit_fc(self):
         for l in range(0, self.depth-1):
-            self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)            
+            self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)
             self.layers[l+1].a = self.layers[l].activation(self.layers[l+1].z)
 
-    #@jit    
+    #@jit
     #def jit_bc(self):
     #    for l in range(self.depth - 2, 0, -1):
     #                self.layers[l].delta = np.dot(self.weight[l+1].T, self.layers[l+1].delta) \
@@ -51,7 +51,7 @@ class Momentum(Model):
     #        idxs = np.random.permutation(train_size)
 
     #        for k in range(math.ceil(train_size/self.batch)):
-    #            start_idx = k*self.batch 
+    #            start_idx = k*self.batch
     #            end_idx = min((k+1)*self.batch, train_size)
     #            batch_indices = idxs[start_idx:end_idx]
 
@@ -61,18 +61,18 @@ class Momentum(Model):
     #            # forward computation
     #            #self.jit_fc()
     #            for l in range(0, L-1):
-    #                self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)                   
+    #                self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)
     #                self.layers[l+1].a = self.layers[l].activation(self.layers[l+1].z)
-                    
+
 
     #            # backward computation
     #            self.layers[L-1].delta = self.dCostFunction(self.layers[L-1].a, y) * \
-    #                self.layers[L-1].dactivation(self.layers[L-1].z)                
+    #                self.layers[L-1].dactivation(self.layers[L-1].z)
     #            for l in range(L - 2, 0, -1):
     #                self.layers[l].delta = np.dot(self.weight[l+1].T, self.layers[l+1].delta) \
     #                                       * self.layers[l].dactivation(self.layers[l].z)
     #            #self.jit_bc()
-                    
+
     #            # weights update
     #            for l in range(0, L-1):
 
@@ -81,72 +81,68 @@ class Momentum(Model):
     #                vw[l+1] = dr * vw[l+1] + (1-dr) * grad_w
     #                self.weight[l+1] = self.weight[l+1] - self.alpha * vw[l+1]
     #            #self.jit_updateW(vw, dr)
-                 
+
     #        # train process
     #        self.trainOutputs.append(self.getOutput(self.trainData))
     #        # validate process
     #        self.validateOutputs.append(self.getOutput(self.validateData))
     '''
-            
-    
+
     def train(self):
         start = time.time()
 
         train_size = self.trainData.shape[1]
         L = self.depth
-        vw = {}         #Momentum
+        vw = {}         # Momentum
         dr = 0.9
         for i in range(1, L):
             vw[i] = np.zeros(self.weight[i].shape)
 
-            #print(vw[i].shape)
-        
-        #self.jit_update(train_size,L,vw,dr)
+            # print(vw[i].shape)
+
+        # self.jit_update(train_size,L,vw,dr)
         for epoch_num in range(self.epoch):
             startTime = time.time()
             idxs = np.random.permutation(train_size)
 
             for k in range(math.ceil(train_size/self.batch)):
-                start_idx = k*self.batch 
+                start_idx = k*self.batch
                 end_idx = min((k+1)*self.batch, train_size)
                 batch_indices = idxs[start_idx:end_idx]
 
                 self.layers[0].a = self.trainData[:, batch_indices]
                 y = self.trainLabel[:, batch_indices]
 
-                
-
                 # forward computation
-                #self.jit_fc()
-                
+                # self.jit_fc()
+
                 for l in range(0, L-1):
                     self.layers[l+1].z = np.dot(self.weight[l+1], self.layers[l].a)
-                    #self.layers[l+1].z = ut.matrixMultiply(self.weight[l+1], self.layers[l].a)                    
+                    # self.layers[l+1].z = ut.matrixMultiply(self.weight[l+1], self.layers[l].a)
                     self.layers[l+1].a = self.layers[l].activation(self.layers[l+1].z)
 
                 # backward computation
                 self.layers[L-1].delta = self.dCostFunction(self.layers[L-1].a, y) * \
-                    self.layers[L-1].dactivation(self.layers[L-1].z)                
+                    self.layers[L-1].dactivation(self.layers[L-1].z)
                 for l in range(L - 2, 0, -1):
                     self.layers[l].delta = np.dot(self.weight[l+1].T, self.layers[l+1].delta) \
                                            * self.layers[l].dactivation(self.layers[l].z)
-                    #self.layers[l].delta = ut.elementMultiply(np.dot(self.weight[l+1].T, self.layers[l+1].delta), \
+                    # self.layers[l].delta = ut.elementMultiply(np.dot(self.weight[l+1].T, self.layers[l+1].delta), \
                     #                        self.layers[l].dactivation(self.layers[l].z))
-                    #self.layers[l].delta = ut.matrixMultiply(self.weight[l+1].T, self.layers[l+1].delta) \
+                    # self.layers[l].delta = ut.matrixMultiply(self.weight[l+1].T, self.layers[l+1].delta) \
                     #                       * self.layers[l].dactivation(self.layers[l].z)
-                #self.jit_bc()
-                    
+                # self.jit_bc()
+
                 # weights update
                 for l in range(0, L-1):
 
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)
-                    #grad_w = ut.matrixMultiply(self.layers[l + 1].delta, self.layers[l].a.T)
-                    #vw[l+1] = dr * vw[l+1] + (1-dr) * grad_w
-                    vw[l+1]=ut.updateVW(vw[l+1],dr,grad_w)
-                    #self.weight[l+1] = self.weight[l+1] - self.alpha * vw[l+1]
-                    self.weight[l+1]=ut.updateWeightMomentum(self.weight[l+1],self.alpha,vw[l+1])
-                
-                   
+                    # grad_w = ut.matrixMultiply(self.layers[l + 1].delta, self.layers[l].a.T)
+                    # vw[l+1] = dr * vw[l+1] + (1-dr) * grad_w
+                    vw[l+1] = ut.updateVW(vw[l+1], dr, grad_w)
+                    # self.weight[l+1] = self.weight[l+1] - self.alpha * vw[l+1]
+                    self.weight[l+1] = ut.updateWeightMomentum(self.weight[l+1], self.alpha, vw[l+1])
+
             # train process
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
@@ -156,11 +152,11 @@ class Momentum(Model):
 
             endTime = time.time()
 
-            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
-                .format(epoch_num + 1, self.epoch, 
-                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
-                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
-                endTime - startTime))
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"
+                  .format(epoch_num + 1, self.epoch,
+                          self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                          self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                          endTime - startTime))
         # test result
         self.testResult = self.testOutputs[-1]
         # train result
@@ -168,7 +164,7 @@ class Momentum(Model):
         # validate result
         self.validateResult = self.validateOutputs[-1]
 
-        end = time.time()         
+        end = time.time()
         print("globaltime={}s".format(end-start))
 
 
@@ -203,11 +199,10 @@ if __name__ == '__main__':
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
 
-    plt.grid(axis='y',linestyle='-.')
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+    plt.grid(axis='y', linestyle='-.')
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.trainOutputs, model.trainLabel), label="train", c="b")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.testOutputs, model.testLabel), label="test", c="r")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.validateOutputs, model.validateLabel), label="valid", c="y")
     plt.title("Accuracy")
     plt.legend()
     plt.show()
-

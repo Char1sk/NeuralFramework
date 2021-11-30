@@ -45,6 +45,7 @@ def testZero(WeightMatrix):  # 用0图像上半部分进行测试
     plt.ylim([0, 60])
     plt.show()
 
+
 def testOne(WeightMatrix):  # 用1图像下半部分进行测试
     test1 = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1]
     arrayTest1 = np.array(test1)
@@ -80,6 +81,7 @@ def testOne(WeightMatrix):  # 用1图像下半部分进行测试
     plt.ylim([0, 60])
     plt.show()
 
+
 def testTwo(WeightMatrix):  # 用2图像一部分进行测试
     test2 = [1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1, -1, 1, -1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1]
     arrayTest2 = np.array(test2)
@@ -114,8 +116,6 @@ def testTwo(WeightMatrix):  # 用2图像一部分进行测试
     plt.xlim([0, 50])
     plt.ylim([0, 60])
     plt.show()
-
-
 
 
 data = np.array([[-1, 1, 1, 1, -1, 1, -1, -1, -1, 1, 1, -1, -1, -1, 1, 1, -1, -1, -1, 1, 1, -1, -1, -1, 1, -1, 1, 1, 1, -1],

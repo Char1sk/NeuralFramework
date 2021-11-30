@@ -5,9 +5,10 @@ from Dataset import Dataset
 from Setting import Setting
 from Model import Model
 from scipy.io import loadmat
-import math,time
-#import Utility as ut 
-import UtilityJit as ut 
+import time
+# import Utility as ut
+import UtilityJit as ut
+
 
 class ForwardNetwork(Model):
     # 一般没有什么额外设置，如有则在Setting里添加
@@ -42,8 +43,8 @@ class ForwardNetwork(Model):
                 for l in range(0, L-1):
                     # print(self.layers[l + 1].delta.shape)
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)/m
-                    #self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
-                    self.weight[l+1]=ut.updateWeight(self.weight[l+1], self.alpha, grad_w)
+                    # self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
+                    self.weight[l+1] = ut.updateWeight(self.weight[l+1], self.alpha, grad_w)
             # train process
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
@@ -53,11 +54,11 @@ class ForwardNetwork(Model):
 
             endTime = time.time()
 
-            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
-                .format(epoch_num + 1, self.epoch, 
-                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
-                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
-                endTime - startTime))
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"
+                  .format(epoch_num + 1, self.epoch,
+                          self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                          self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                          endTime - startTime))
         # test result
         self.testResult = self.testOutputs[-1]
         # train result
@@ -65,7 +66,7 @@ class ForwardNetwork(Model):
         # validate result
         self.validateResult = self.validateOutputs[-1]
 
-        end = time.time()         
+        end = time.time()
         print("globaltime={}s".format(end-start))
 
 
@@ -100,10 +101,10 @@ if __name__ == '__main__':
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
 
-    plt.grid(axis='y',linestyle='-.')
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+    plt.grid(axis='y', linestyle='-.')
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.trainOutputs, model.trainLabel), label="train", c="b")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.testOutputs, model.testLabel), label="test", c="r")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.validateOutputs, model.validateLabel), Label="valid", c="y")
     plt.title("Accuracy")
     plt.legend()
     plt.show()

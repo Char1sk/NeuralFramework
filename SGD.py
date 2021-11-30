@@ -6,8 +6,9 @@ from Setting import Setting
 from Model import Model
 from scipy.io import loadmat
 import time
-#import Utility as ut 
-import UtilityJit as ut 
+# import Utility as ut
+import UtilityJit as ut
+
 
 def accuracy(a, y):
     mini_batch = a.shape[1]
@@ -23,7 +24,7 @@ class SGD(Model):
         super().__init__(dataset, setting)
 
     def train(self):
-        start= time.time()
+        start = time.time()
         train_size = self.trainData.shape[1]
         L = self.depth
         for epoch_num in range(self.epoch):
@@ -48,8 +49,8 @@ class SGD(Model):
                 # weights update
                 for l in range(0, L-1):
                     grad_w = np.dot(self.layers[l + 1].delta, self.layers[l].a.T)
-                    #self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
-                    self.weight[l+1]=ut.updateWeight(self.weight[l+1], self.alpha, grad_w)
+                    # self.weight[l+1] = self.weight[l+1] - self.alpha * grad_w
+                    self.weight[l+1] = ut.updateWeight(self.weight[l+1], self.alpha, grad_w)
             # train process
             self.trainOutputs.append(self.getOutput(self.trainData))
             # validate process
@@ -59,11 +60,11 @@ class SGD(Model):
 
             endTime = time.time()
 
-            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"\
-                .format(epoch_num + 1, self.epoch, 
-                self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
-                self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
-                endTime - startTime))
+            print("{}/{}: train acc = {:.4f} || validate acc = {:.4f}   time={:.4f}s"
+                  .format(epoch_num + 1, self.epoch,
+                          self.calculateAccuracy(self.trainOutputs[-1], self.trainLabel),
+                          self.calculateAccuracy(self.validateOutputs[-1], self.validateLabel),
+                          endTime - startTime))
         # test result
         self.testResult = self.testOutputs[-1]
         # train result
@@ -71,7 +72,7 @@ class SGD(Model):
         # validate result
         self.validateResult = self.validateOutputs[-1]
 
-        end = time.time()         
+        end = time.time()
         print("globaltime={}s".format(end-start))
 
 
@@ -106,10 +107,10 @@ if __name__ == '__main__':
     print("Precision = {}".format(model.calculatePrecision(model.trainResult, model.trainLabel)))
     print("F1Score   = {}".format(model.calculateF1Score(model.trainResult, model.trainLabel)))
 
-    plt.grid(axis='y',linestyle='-.')
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.trainOutputs, model.trainLabel),label="train",c="b")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.testOutputs, model.testLabel),label="test",c="r")
-    plt.plot(np.arange(model.epoch),model.calculateAccuracy(model.validateOutputs, model.validateLabel),label="valid",c="y")
+    plt.grid(axis='y', linestyle='-.')
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.trainOutputs, model.trainLabel), label="train", c="b")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.testOutputs, model.testLabel), label="test", c="r")
+    plt.plot(np.arange(model.epoch), model.calculateAccuracy(model.validateOutputs, model.validateLabel), label="valid", c="y")
     plt.title("Accuracy")
     plt.legend()
     plt.show()

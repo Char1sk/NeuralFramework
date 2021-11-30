@@ -15,6 +15,9 @@ def strToFunc(funcname):
         return (softmaxCrossEntropy, dSoftmaxCrossEntropy)
     if funcname == 'hardlim':
         return (hardlim, None)
+    if funcname == 'hardlims':
+        return (hardlims, None)
+
 
 # 【激活函数】硬极限函数
 @jit(nopython=True)
@@ -46,7 +49,6 @@ def dLinear(x):
 @jit(nopython=True)
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
-
 
 
 # 【激活函数导数】Sigmoid函数
@@ -91,13 +93,13 @@ def matrixMultiply(a, b):
 # 更新权重
 @jit(nopython=True)
 def updateWeight(w, lr, grad_w):
-    w=w-lr*grad_w
-    return w 
+    w = w-lr*grad_w
+    return w
 
 # 【Momentum】更新权重
 @jit(nopython=True)
 def updateWeightMomentum(w, lr, vw):
-    w=w-lr*vw
+    w = w-lr*vw
     return w
 
 # 【Momentum】更新动量
@@ -109,50 +111,45 @@ def updateVW(vw, dr, grad_w):
 # 【Adam】更新权重
 @jit(nopython=True)
 def updateWeightAdam(w, lr, mtt, vtt):
-    w -= lr * mtt / (np.sqrt(vtt) + 1e-8)  
+    w -= lr * mtt / (np.sqrt(vtt) + 1e-8)
     return w
 
-# 【Adam】更新mt  
+# 【Adam】更新mt
 @jit(nopython=True)
-def updateMT(mt, b1,grad_w):
-    mt  = b1 *mt+(1-b1)*grad_w
+def updateMT(mt, b1, grad_w):
+    mt = b1*mt+(1-b1)*grad_w
     return mt
 
-# 【Adam】更新vt 
-@jit(nopython=True) 
+# 【Adam】更新vt
+@jit(nopython=True)
 def updateVT(vt, b2, grad_w):
-    vt = b2 *vt + (1-b2)*(grad_w**2)
+    vt = b2 * vt + (1-b2)*(grad_w**2)
     return vt
 
-# 【Adam】更新mtt  
+# 【Adam】更新mtt
 @jit(nopython=True)
 def updateMTT(mt, b1, k):
-    mtt = mt/(1-(b1**(k+1)))###mt的偏置矫正
-                    
+    mtt = mt/(1-(b1**(k+1)))    # mt的偏置矫正
     return mtt
 
-# 【Adam】更新vtt 
-@jit(nopython=True) 
+# 【Adam】更新vtt
+@jit(nopython=True)
 def updateVTT(vt, b2, k):
-    vtt = vt/(1-(b2**(k+1)))##vt的偏置矫正
+    vtt = vt/(1-(b2**(k+1)))    # vt的偏置矫正
     return vtt
 
+
 if __name__ == '__main__':
-    arr1=np.random.randn(500,600)
-    arr2=np.random.randn(600,700)
-
-
-    start1=time.time()
+    arr1 = np.random.randn(500, 600)
+    arr2 = np.random.randn(600, 700)
+    start1 = time.time()
     for i in range(5000):
-        arr3=np.dot(arr1,arr2)
-    end1=time.time()
+        arr3 = np.dot(arr1, arr2)
+    end1 = time.time()
     print("{:.6f}s".format(end1-start1))
 
-
-    start2=time.time()
+    start2 = time.time()
     for i in range(5000):
-        arr4=matrixMultiply(arr1,arr2)
-    end2=time.time()
+        arr4 = matrixMultiply(arr1, arr2)
+    end2 = time.time()
     print("{:.6f}s".format(end2-start2))
-
-   

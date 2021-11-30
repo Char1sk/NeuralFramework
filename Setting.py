@@ -64,7 +64,7 @@ class Setting():
 
     # DEBUG:
     # 输出所有成员
-    def ParamShow(self):
+    def show(self):
         print('layers =', self.layers)
         print('depth =', self.depth)
         print('batch =', self.batch)
@@ -83,4 +83,4 @@ if __name__ == '__main__':
     setting.saveSetting('./testSetting.json')
     newSetting = Setting()
     newSetting.loadSetting('./testSetting.json')
-    newSetting.ParamShow()
+    newSetting.show()

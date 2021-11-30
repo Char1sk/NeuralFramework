@@ -1,8 +1,9 @@
+from Layer import Layer
 import numpy as np
 from Dataset import Dataset
 from Setting import Setting
-#import Utility as ut
-import UtilityJit as ut 
+# import Utility as ut
+import UtilityJit as ut
 
 
 class Model():
@@ -224,7 +225,7 @@ if __name__ == '__main__':
     label = np.array([[1, 1, 1, 0]])
     data = Dataset(allSet=[data.T, label])
     # 只需额外定义 layers
-    s = Setting([2, 1])
+    s = Setting([Layer(2, 'linear'), Layer(1, 'linear')])
     # 定义模型
     model = Model(data, s)
 
