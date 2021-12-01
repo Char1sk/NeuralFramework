@@ -1,14 +1,51 @@
 # 神经网络框架设计
 
+<!-- 以下部分为用户需读 -->
 ## 文件结构
 
-- 一个文件里面放一个类(同名)
-- Model: 模型基类，包含统一的一些操作
-- xxxxx: 派生类，是实际的模型，实现了具体操作(现在不写)
-- Setting: 参数设置类，代表模型的配置信息，提供信息保存和修改
-- Dataset: 数据集类，提供数据保存，以及基本的预处理功能
-- Layer：神经网络中的一层，主要是信息的整合，结构化
+- 模型基础部分
+  - Layer：神经网络中的一层，主要是信息的整合，结构化
+  - Setting: 参数设置类，代表模型的配置信息，提供信息保存和修改
+  - Dataset: 数据集类，提供数据保存，以及基本的预处理功能
+  - Utility：包含激活函数、损失函数及其导数，以及一些更新过程
+  - UtilityJit：和Utility基本相同，但使用了Numba进行CPU加速
+- 模型部分
+  - Model: 模型基类，包含统一的一些操作
+  - HebbModel：使用Hebb更新的子类模型
+  - ForwardNetwork：使用mSGD更新的子类模型
+  - SGD：使用SGD更新的子类模型
+  - Momentum：使用Momentum更新的子类模型
+  - Adam：使用Adam更新的自类模型
+- 测试部分
+  - Test：使用感知机测试模型基础部分
+  - HebbApplication：简单的模式识别，测试Hebb
+  - mnist_test：在MNIST对各模型进行测试
+  - SvhnTest：在SVHN对模型进行测试
+- 配置文件
+  - testSetting.json：Setting测试配置
+  - testSettingAdam.json：Adma的测试配置
+  - testSettingForward.json：mSGD测试配置
+  - testSettingMomentum.json：Momentum测试配置
+  - testSettingSGD.json：SGD测试配置
+  - svhnSetting.json：SVHN测试配置
 
+## 运行环境
+
+- Windows 10/11 操作系统
+- Python 3.7 及以上
+- 相关包参见requirements.txt
+- [MNIST数据集下载](http://yann.lecun.com/exdb/mnist/)
+- [SVHN数据集下载](http://ufldl.stanford.edu/housenumbers/)
+
+## 运行方法
+
+- 大多数文件可以直接作为主函数运行，为对应模块的单元测试
+- 上述的测试文件可以运行，对应相应的测试功能
+- 自定义参数：创建Setting并修改，或创建Json并读取
+- 自定义模型：继承Model，重载train函数即可
+- 自定义函数：创建模型，为activation或cost赋值即可
+
+<!-- 以下内容为开发过程中组员需读 -->
 ## 函数注释说明
 
 - TODO 表明该函数需要完成

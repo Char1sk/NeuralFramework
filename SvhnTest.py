@@ -1,3 +1,4 @@
+from Momentum import Momentum
 import numpy as np
 from SGD import SGD
 # from ForwardNetwork import ForwardNetwork

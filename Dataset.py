@@ -100,7 +100,8 @@ class Dataset():
     def loadDataset(self, path):
         # use pickle to load dataset, split data only
         f = open(path, 'rb')
-        (self.trainData, self.trainLabel, self.validateData, self.validateLabel, self.testData, self.testLabel)\
+        (self.trainData, self.trainLabel, self.validateData,
+         self.validateLabel, self.testData, self.testLabel)\
             = pickle.load(f)
 
     # DEBUG:
