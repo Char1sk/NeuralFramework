@@ -1,7 +1,7 @@
 import numpy as np
 from SGD import SGD
-from ForwardNetwork import ForwardNetwork
-from Adam import Adam
+# from ForwardNetwork import ForwardNetwork
+# from Adam import Adam
 from scipy.io import loadmat
 # from Layer import Layer
 from Dataset import Dataset
@@ -65,8 +65,8 @@ data = Dataset(trainSet=[X_train, Y_train], validateSet=[X_validate, Y_validate]
 para = Setting()
 para.loadSetting(r"svhnSetting.json")
 
-# model = SGD(data, para)
-model = Adam(data, para)
+model = SGD(data, para)
+# model = Adam(data, para)
 print("Training begin.")
 model.train()
 print("Accuracy  = {:<4.2f}".format(model.calculateAccuracy(model.trainResult, model.trainLabel)))

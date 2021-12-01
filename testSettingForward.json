@@ -22,8 +22,8 @@
             "activation": "sigmoid"
         }
     ],
-    "batch": 100,
-    "alpha": 0.5,
+    "batch": 10,
+    "alpha": 0.1,
     "epoch": 10,
     "initialize": "normal",
     "costFunction": "meanSquareError"
